@@ -19,8 +19,8 @@ function switchMode() {
     }
 }
 
-function redirectSignUp() {
-    window.location.pathname = "/signup"
+function redirectQuestionnaire() {
+	window.location.replace("http://185.46.11.65:8002/");
 }
 
 async function handleSubmitClick() {
@@ -219,7 +219,7 @@ const SignInForm = ({ handleClick }) => {
                     <Button variant="success" id="button_return" onClick={handleReturnClick}>
                         Ввести почту заново
                     </Button>
-                    <Button variant="success" onClick={redirectSignUp} id="button_quiz" style={{display:'none'}}>
+                    <Button variant="success" onClick={redirectQuestionnaire} id="button_quiz" style={{display:'none'}}>
                         Заполнить анкету
                     </Button>
                 </div>
@@ -253,7 +253,7 @@ const SignInForm = ({ handleClick }) => {
                     <Button variant="success" id="button_return" onClick={handleReturnClick}>
                         Ввести почту заново
                     </Button>
-                    <Button variant="success" onClick={redirectSignUp} id="button_quiz" style={{display:'none'}}>
+                    <Button variant="success" onClick={redirectQuestionnaire} id="button_quiz" style={{display:'none'}}>
                         Заполнить анкету
                     </Button>
                 </div>

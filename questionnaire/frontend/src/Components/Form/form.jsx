@@ -54,7 +54,7 @@ export default function Form() {
 					.then((x) => x.data)
 					.then((x) => {
 						if (!speciality.includes(x.speciality)) {
-							x.another = x.speciality;
+							setAnother(x.speciality);
 							x.speciality = "";
 						}
 						return x;
@@ -156,7 +156,7 @@ export default function Form() {
 			<div id="upTile">
 				<h3 id="text">Форма анкеты</h3>
 
-				<button id="btnBack" onclick=""></button>
+				{/* <button id="btnBack" onclick=""></button> */}
 			</div>
 
 			<h3 id="quizText">Пол:</h3>

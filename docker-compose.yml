@@ -1,0 +1,59 @@
+version: "3.9"
+services:
+    user-backend:
+      container_name: user-backend
+      build: ./user/backend
+      networks:
+        - local-net
+      volumes:
+        - ./user/backend/app/app/storage:/app/app/storage
+
+    user-frontend:
+      extends:
+        file: user/docker-compose.yml
+        service: user-frontend
+
+    questionnaire-backend:
+      container_name: questionnaire-backend
+      build: ./questionnaire/backend
+      networks:
+        - local-net
+      volumes:
+        - ./questionnaire/backend/app/app/storage:/app/app/storage
+
+    questionnaire-frontend:
+      extends:
+        file: questionnaire/docker-compose.yml
+        service: questionnaire-frontend
+
+
+    nginx:
+      container_name: nginx
+      build:
+        context: ./nginx
+        args:
+          USER_PORT: ${USER_PORT}
+          QUESTIONNAIRE_PORT: ${QUESTIONNAIRE_PORT}
+      ports:
+        - "${USER_PORT}:${USER_PORT}"
+        - "${QUESTIONNAIRE_PORT}:${QUESTIONNAIRE_PORT}"
+      volumes:
+        - user-front:/usr/share/nginx/user/
+        - questionnaire-front:/usr/share/nginx/questionnaire/
+      depends_on:
+        - user-backend
+        - user-frontend
+        - questionnaire-backend
+        - questionnaire-frontend
+      networks:
+        - local-net
+
+
+volumes:
+  user-front:
+  questionnaire-front:
+
+
+networks:
+  local-net:
+    driver: bridge

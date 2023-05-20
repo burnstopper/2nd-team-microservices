@@ -7,6 +7,7 @@ import reportWebVitals from "./reportWebVitals";
 
 import Header from "./Components/Menu/Header/Header";
 import Form from "./Components/Form/form";
+import CookieLib from "./cookielib/index";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 let id = Math.floor(Math.random() * 1000000 + 10000000);
@@ -14,6 +15,7 @@ root.render(
 	<>
 		<Header />
 		<Form id={id} />
+	    <CookieLib.CookieFooter/>
 	</>
 );
 

@@ -56,13 +56,15 @@ const Verification = ({handleClick}) => {
     if (result === 'signup_success') {
         return (
             <div className="content">
-                <div className="frame" style={{height: '340px'}}>
-                    <div className="text_general" id="text_mode">
-                        Email успешно подтвержден! Вы зарегистрированы и авторизованы.<br/>Тесты доступны на верхней
-                        панели.<br/>Чтобы принять участие в исследовании, пожалуйста, заполните анкету.
+                <div className="frame">
+                    <div className="text_and_input" style={{justifyContent: 'space-between'}}>
+                        <div className="text_general">
+                            Email успешно подтвержден! Вы зарегистрированы и авторизованы.<br/>Тесты доступны на верхней
+                            панели.<br/>Чтобы принять участие в исследовании, пожалуйста, заполните анкету.
+                        </div>
                     </div>
                     <div className="submit">
-                        <button className="btn_default" onClick={redirectQuestionnaire} id="button_quiz">
+                        <button className="btn_default" onClick={redirectQuestionnaire} id="button_quiz_verif">
                             Заполнить анкету
                         </button>
                     </div>
@@ -73,8 +75,10 @@ const Verification = ({handleClick}) => {
         return (
             <div className="content">
                 <div className="frame">
-                    <div className="text_general" id="text_mode">
-                        Срок действия ссылки истек.<br/> Пожалуйста, зарегистрируйтесь заново.
+                    <div className="text_and_input">
+                        <div className="text_general" id="text_mode">
+                            Срок действия ссылки истек.<br/> Пожалуйста, зарегистрируйтесь заново.
+                        </div>
                     </div>
                     <div className="submit">
                         <button className="btn_default" onClick={redirectSignUp} id="button_repeat">
@@ -87,13 +91,15 @@ const Verification = ({handleClick}) => {
     } else if (result === 'login_success') {
         return (
             <div className="content">
-                <div className="frame" style={{height: '340px'}}>
-                    <div className="text_general" id="text_mode">
-                        Вы авторизованы. Рады снова видеть вас на Burnout tester!<br/>Тесты доступны на верхней
-                        панели.<br/>Чтобы принять участие в исследовании, пожалуйста, заполните анкету.
+                <div className="frame">
+                    <div className="text_and_input" style={{justifyContent: 'space-between'}}>
+                        <div className="text_general" id="text_mode">
+                            Вы авторизованы. Рады снова видеть вас на Burnout tester!<br/>Тесты доступны на верхней
+                            панели.<br/>Чтобы принять участие в исследовании, пожалуйста, заполните анкету.
+                        </div>
                     </div>
                     <div className="submit">
-                        <button className="btn_default" onClick={redirectQuestionnaire} id="button_quiz">
+                        <button className="btn_default" onClick={redirectQuestionnaire} id="button_quiz_verif">
                             Заполнить анкету
                         </button>
                     </div>
@@ -104,8 +110,10 @@ const Verification = ({handleClick}) => {
         return (
             <div className="content">
                 <div className="frame">
-                    <div className="text_general" id="text_mode">
-                        Срок действия ссылки истек.<br/> Пожалуйста, авторизуйтесь заново.
+                    <div className="text_and_input">
+                        <div className="text_general" id="text_mode">
+                            Срок действия ссылки истек.<br/> Пожалуйста, авторизуйтесь заново.
+                        </div>
                     </div>
                     <div className="submit">
                         <button className="btn_default" onClick={redirectLogin} id="button_repeat">

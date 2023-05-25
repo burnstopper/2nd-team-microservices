@@ -26,25 +26,43 @@ services:
         file: questionnaire/docker-compose.yml
         service: questionnaire-frontend
 
+    quiz-backend:
+      container_name: quiz-backend
+      build: ./quiz/backend
+      networks:
+        - local-net
+      volumes:
+        - ./quiz/backend/app/app/storage:/app/app/storage
+
+    quiz-frontend:
+      extends:
+        file: quiz/docker-compose.yml
+        service: quiz-frontend
+
 
     nginx:
       container_name: nginx
+      environment:
+        USER_PORT: ${USER_PORT}
+        QUESTIONNAIRE_PORT: ${QUESTIONNAIRE_PORT}
+        QUIZ_PORT: ${QUIZ_PORT}
       build:
         context: ./nginx
-        args:
-          USER_PORT: ${USER_PORT}
-          QUESTIONNAIRE_PORT: ${QUESTIONNAIRE_PORT}
       ports:
         - "${USER_PORT}:${USER_PORT}"
         - "${QUESTIONNAIRE_PORT}:${QUESTIONNAIRE_PORT}"
+        - "${QUIZ_PORT}:${QUIZ_PORT}"
       volumes:
         - user-front:/usr/share/nginx/user/
         - questionnaire-front:/usr/share/nginx/questionnaire/
+        - quiz-front:/usr/share/nginx/quiz/
       depends_on:
         - user-backend
         - user-frontend
         - questionnaire-backend
         - questionnaire-frontend
+        - quiz-backend
+        - quiz-frontend
       networks:
         - local-net
 
@@ -52,6 +70,7 @@ services:
 volumes:
   user-front:
   questionnaire-front:
+  quiz-front:
 
 
 networks:

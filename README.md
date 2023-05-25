@@ -1,2 +1,3 @@
 # 2nd-team-microservices
-Full setup of "Study management subsystem"
+Полная сборка микросервисов <<Подсистемы управления исследованием>> для развертывания на удалённом сервере.\
+Для запуска требуются `docker` и `docker-compose`.

@@ -15,7 +15,7 @@ router = APIRouter()
 
 
 @router.get('/{quiz_id}/status', status_code=status.HTTP_200_OK, response_model=QuizResultsStatus)
-async def get_quiz_results_status(quiz_id: int, respondent_id: int = None,
+async def get_quiz_results_status(quiz_id: int, respondent_id: int | None = None,
                                   db: AsyncSession = Depends(get_db)) -> QuizResultsStatus:
     """
     Get result status of quiz by id
@@ -40,7 +40,8 @@ async def get_quiz_results_status(quiz_id: int, respondent_id: int = None,
 
 
 @router.get('/{quiz_id}', status_code=status.HTTP_200_OK, response_model=QuizResults)
-async def get_quiz_results(quiz_id: int, respondent_id: int = None, db: AsyncSession = Depends(get_db)) -> QuizResults:
+async def get_quiz_results(quiz_id: int, respondent_id: int | None = None,
+                           db: AsyncSession = Depends(get_db)) -> QuizResults:
     """
     Get result of quiz by id
     """
@@ -65,7 +66,7 @@ async def get_quiz_results(quiz_id: int, respondent_id: int = None, db: AsyncSes
 
 
 @router.get('/status/', status_code=status.HTTP_200_OK, response_model=list[QuizResultsStatus])
-async def get_quizzes_results_status(quizzes_ids: Annotated[list[int], Query()], respondent_id: int = None,
+async def get_quizzes_results_status(quizzes_ids: Annotated[list[int], Query()], respondent_id: int | None = None,
                                      db: AsyncSession = Depends(get_db)) -> list[QuizResultsStatus]:
     """
     Get result status of quizzes
@@ -78,7 +79,7 @@ async def get_quizzes_results_status(quizzes_ids: Annotated[list[int], Query()],
 
 
 @router.get('/', status_code=status.HTTP_200_OK, response_model=list[QuizResults])
-async def get_quizzes_results(quizzes_ids: Annotated[list[int], Query()], respondent_id: int = None,
+async def get_quizzes_results(quizzes_ids: Annotated[list[int], Query()], respondent_id: int | None = None,
                               db: AsyncSession = Depends(get_db)) -> list[QuizResults]:
     """
     Get result of quizzes

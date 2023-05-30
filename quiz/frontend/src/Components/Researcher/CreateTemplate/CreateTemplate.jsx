@@ -75,8 +75,8 @@ export default withParams(
 		async createToken() {
 			let token = await axios
 				.post("/api/token/create_respondent")
-				.then((x) => x.data)
-				.catch((e) => alert(e.response.statusText));
+				.then((x) => x.data.respondent_token)
+				.catch((e) => alert(e.response.data?.detail || e.response.statusText));
 			CookieLib.setCookieToken(token);
 			return token;
 		}
@@ -84,10 +84,23 @@ export default withParams(
 		async checkPermissions() {
 			let check = await axios
 				.get(`/api/token/${this.state.token}/check_researcher`)
-				.then((x) => x.data)
-				.catch((e) => alert(e.response.statusText));
+				.then((x) => x.data.is_researcher)
+				.catch((e) => alert(e.response.data?.detail || e.response.statusText));
 			// let check = true;
-			this.setState({ check });
+
+			let tests = await axios
+				.get(`/api/tests`)
+				.then((x) => x.data)
+				.catch((e) => alert(e.response.data?.detail || e.response.statusText));
+			// let tests = [
+			// 	{ id: 1, name: "Что-то первое" },
+			// 	{ id: 2, name: "Что-то второе" },
+			// 	{ id: 3, name: "Что-то третье" },
+			// 	{ id: 4, name: "Что-то четвертое" },
+			// 	{ id: 5, name: "Что-то пятое" },
+			// ];
+
+			this.setState({ check, tests, loading: false });
 		}
 
 		async delete(index) {
@@ -105,7 +118,7 @@ export default withParams(
 			let template = await axios
 				.get(`/api/templates/${this.state.template_id}`)
 				.then((x) => x.data)
-				.catch((e) => alert(e.response.statusText));
+				.catch((e) => alert(e.response.data?.detail || e.response.statusText));
 
 			if (template)
 				this.setState({
@@ -125,7 +138,9 @@ export default withParams(
 					let id = await axios
 						.get(`/api/token/${token}/id`)
 						.then((x) => x.data)
-						.catch((e) => alert(e.response.statusText));
+						.catch((e) =>
+							alert(e.response.data?.detail || e.response.statusText)
+						);
 					if (!token) token = await this.createToken();
 
 					this.setState({ token, id }, this.checkPermissions);
@@ -135,26 +150,10 @@ export default withParams(
 				// 		.get(
 				// 			`/api/token/${this.state.quiz_id}/check_researcher`
 				// 		)
-				// 		.then((x) => x.data).catch((e) => alert(e.response.statusText));
+				// 		.then((x) => x.data).catch((e) => alert(e.response.data?.detail || e.response.statusText));
 				// 	// let check = true;
 				// 	this.setState({ check });
 				// },
-				getAllQuizes: async () => {
-					let tests = await axios
-						.get(`/api/tests`)
-						.then((x) => x.data)
-						.catch((e) => alert(e.response.statusText));
-					// let tests = [
-					// 	{ id: 1, name: "Что-то первое" },
-					// 	{ id: 2, name: "Что-то второе" },
-					// 	{ id: 3, name: "Что-то третье" },
-					// 	{ id: 4, name: "Что-то четвертое" },
-					// 	{ id: 5, name: "Что-то пятое" },
-					// ];
-					this.setState({
-						tests,
-					});
-				},
 			};
 			async function start() {
 				for (let i of Object.keys(getData)) {
@@ -164,7 +163,7 @@ export default withParams(
 				if (this.state.template_id && this.state.template_id !== "create")
 					await this.getTemplateData();
 
-				this.setState({ loading: false });
+				// this.setState({ loading: false });
 			}
 			start.bind(this)();
 		}
@@ -182,17 +181,20 @@ export default withParams(
 						tests_ids: this.state.template.tests.map((x) => x.id),
 						name: this.state.name,
 					})
-					.catch((e) => alert(e.response.statusText));
+					.catch((e) =>
+						alert(e.response.data?.detail || e.response.statusText)
+					);
 			else
 				data = await axios
-					.post(`/api/templates`, {
-						id: this.state.template_id,
+					.put(`/api/templates/${this.state.template_id}`, {
 						tests_ids: this.state.template.tests.map((x) => x.id),
 						name: this.state.name,
 					})
-					.catch((e) => alert(e.response.statusText));
-			if (data.status === 200) window.location.href = `/researcher/templates`;
-			else alert(data.statusText);
+					.catch((e) =>
+						alert(e.response.data?.detail || e.response.statusText)
+					);
+			if ([200, 201].includes(data?.status)) window.history.back();
+			else alert(data?.data?.detail || data.statusText);
 		}
 
 		render() {
@@ -246,58 +248,7 @@ export default withParams(
 						<p id="text">
 							{this.state.edit ? "Редактирование" : "Создание"} шаблона
 						</p>
-						{/* <div className="component-menu">
-						<Dropdown>
-							<Dropdown.Toggle variant="success" id="dropdown-basic1">
-								Добавить тест
-							</Dropdown.Toggle>
-
-							<Dropdown.Menu>
-								{this.state.tests
-									.filter(
-										(x) => !this.state.template.tests.find((y) => y.id === x.id)
-									)
-									.map((x, i) => (
-										<Dropdown.Item
-											key={i}
-											onClick={(data) => this.handleMenu.bind(this)(data, i)}
-										>
-											<a id="titleTile">{x.name}</a>
-										</Dropdown.Item>
-									))}
-							</Dropdown.Menu>
-						</Dropdown>
-					</div> */}
 					</div>
-					{/* <div id="btnTile">
-					{this.state.template.tests.map((x, i) => (
-						<Droppable
-							id="btnQuizes"
-							// styles={{ maxWidth: "1200px", minWidth: "900px", width: "80%" }}
-							key={i}
-							types={["tests"]}
-							onDrop={(data) => this.handleDrop.bind(this)(data, i)}
-						>
-							<Draggable id="draggable" type="tests" data={i}>
-								<a id="titleTile">{x.name}</a>
-							</Draggable>
-						</Droppable>
-					))}
-				</div> */}
-					{/* <div id="DownPagination">
-        <div className="pagination">
-          <a href="#">&#10094;</a>
-          <a className="active" href="#">
-            1
-          </a>
-          <a href="#">2</a>
-          <a href="#">3</a>
-          <a href="#">4</a>
-          <a href="#">5</a>
-          <a href="#">6</a>
-          <a href="#">&#10095;</a>
-        </div>
-      </div> */}
 					<div id="quizTile">
 						<div id="createQuizTile1" className="row">
 							<a id="quizText">Название опроса</a>

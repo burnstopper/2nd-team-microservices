@@ -272,20 +272,19 @@ body {
 
 #downTile {
     text-align: center;
-    position: absolute;
+    position: inherit;
     margin-bottom: 10%;
     bottom: 0;
     width: 100%;
 }
 
-#btnPlay {
+#btnPlayssss {
     margin-left: 75px;
     background-color: coral;
     color: white;
     border: none;
     border-radius: 22px;
     margin-right: 5%;
-    margin-bottom: 3%;
     width: 25%;
     height: 50px;
     align-items: center;

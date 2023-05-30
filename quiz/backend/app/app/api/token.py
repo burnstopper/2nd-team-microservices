@@ -53,7 +53,7 @@ async def get_respondent_id_by_token(respondent_token: str) -> JSONResponse:
     return JSONResponse(status_code=status.HTTP_200_OK, content={'respondent_id': respondent_id})
 
 
-@router.get('/{token}/check_researcher', status_code=status.HTTP_200_OK, response_class=JSONResponse)
+@router.get('/{user_token}/check_researcher', status_code=status.HTTP_200_OK, response_class=JSONResponse)
 async def check_is_researcher(user_token: str) -> JSONResponse:
     """
     Check is the user a researcher by token
@@ -63,13 +63,17 @@ async def check_is_researcher(user_token: str) -> JSONResponse:
     transport = httpx.AsyncHTTPTransport(retries=10)
     timeout = httpx.Timeout(1.0)
     async with httpx.AsyncClient(transport=transport, timeout=timeout) as client:
-        response = (await client.post(url=f'http://{settings.TOKEN_SERVICE_URL}'
-                                          f'/api/check_researcher/{user_token}',
-                                      headers={'Authorization': f'Bearer {settings.BEARER_TOKEN}'})
+        response = (await client.get(url=f'http://{settings.TOKEN_SERVICE_URL}'
+                                         f'/api/user/check_researcher/{user_token}',
+                                     headers={'Authorization': f'Bearer {settings.BEARER_TOKEN}'})
                     )
 
         if response.status_code != status.HTTP_200_OK:
             raise HTTPException(status_code=response.status_code, detail=json.loads(response.content)['detail'])
 
-    is_researcher: bool = bool(response)
+    is_researcher: bool
+    if response.text == 'true':
+        is_researcher: bool = True
+    else:
+        is_researcher: bool = False
     return JSONResponse(status_code=status.HTTP_200_OK, content={'is_researcher': is_researcher})

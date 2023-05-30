@@ -34,8 +34,8 @@ async def create_quiz(quiz_in: QuizCreate, db: AsyncSession = Depends(get_db)) -
     return await crud_quizzes.create_new_quiz(quiz_in=quiz_in, new_id=new_id, db=db)
 
 
-@router.put('/{quiz_id}', status_code=status.HTTP_200_OK, response_model=RequestedQuiz)
-async def update_quiz(quiz_id: int, quiz_in: QuizUpdate, db: AsyncSession = Depends(get_db)) -> Quiz:
+@router.put('/{quiz_id}', status_code=status.HTTP_200_OK)
+async def update_quiz(quiz_id: int, quiz_in: QuizUpdate, db: AsyncSession = Depends(get_db)):
     """
     Update the quiz by id
     """
@@ -50,7 +50,7 @@ async def update_quiz(quiz_id: int, quiz_in: QuizUpdate, db: AsyncSession = Depe
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                             detail='Quiz with this name already has been created')
 
-    return await crud_quizzes.update_quiz(quiz_id=quiz_id, quiz_in=quiz_in, db=db)
+    await crud_quizzes.update_quiz(quiz_id=quiz_id, quiz_in=quiz_in, db=db)
 
 
 @router.get('/{quiz_id}', status_code=status.HTTP_200_OK, response_model=RequestedQuiz)
@@ -116,3 +116,20 @@ async def has_access_to_quiz(quiz_id: int, respondent_id: int, db: AsyncSession 
                                                           db=db)
 
     return JSONResponse(status_code=status.HTTP_200_OK, content={'has_access': has_access})
+
+
+@router.post('/{quiz_id}/add', status_code=status.HTTP_200_OK)
+async def add_respondent_to_quiz(quiz_id: int, respondent_id: int, db: AsyncSession = Depends(get_db)):
+    is_valid: bool = await check_item_id_is_valid(crud=crud_quizzes, item_id=quiz_id, db=db)
+    if not is_valid:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail='Invalid invite link: quiz with this id does not exist')
+
+    has_added: bool = await has_respondent_added_to_quiz(quiz_id=quiz_id,
+                                                         respondent_id=respondent_id,
+                                                         db=db)
+
+    if has_added:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='Respondent has already added to quiz')
+
+    await crud_quiz_respondents.add_respondent(quiz_id=quiz_id, respondent_id=respondent_id, db=db)

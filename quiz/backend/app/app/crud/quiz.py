@@ -19,18 +19,16 @@ class CRUDQuiz(CRUDBase[Quiz]):
 
         return new_quiz
 
-    async def update_quiz(self, quiz_id: int, quiz_in: QuizUpdate, db: AsyncSession) -> Quiz:
+    async def update_quiz(self, quiz_id: int, quiz_in: QuizUpdate, db: AsyncSession):
         query = (
             update(self.model)
             .where(self.model.id == quiz_id)
             .values(quiz_in.dict(exclude_unset=True))
-            .returning(Quiz)
         )
 
-        updated_quiz: Quiz = (await db.execute(query)).scalar()
-        await db.commit()
+        await db.execute(query)
 
-        return updated_quiz
+        await db.commit()
 
     async def get_all_quizzes(self, db: AsyncSession) -> list[Quiz]:
         query = (

@@ -13,15 +13,14 @@ class CRUDTemplate(CRUDBase[Template]):
 
         return new_template
 
-    async def update_template(self, template_id: int, template_in: TemplateUpdate, db: AsyncSession) -> Template:
+    async def update_template(self, template_id: int, template_in: TemplateUpdate, db: AsyncSession):
         query = (
             update(self.model)
             .where(self.model.id == template_id)
             .values(name=template_in.name)
-            .returning(Template)
         )
 
-        return (await db.execute(query)).scalar()
+        await db.execute(query)
 
     async def get_all_templates(self, db: AsyncSession) -> list[Template]:
         query = (

@@ -33,18 +33,86 @@ export default class Templates extends Component {
 		let token = await axios
 			.post("/api/token/create_respondent")
 			.then((x) => x.data.respondent_token)
-			.catch((e) => alert(e.response.statusText));
+			.catch((e) =>
+				alert(
+					e.response.data?.detail ||
+						e.response.data?.detail ||
+						e.response.statusText
+				)
+			);
 		CookieLib.setCookieToken(token);
 		return token;
+	}
+
+	async getTemplates() {
+		let templates = await axios
+			.get("/api/templates", {
+				params: {
+					// respondent_id: this.state.id
+				},
+			})
+			.then((x) => x.data)
+			.catch((e) =>
+				alert(
+					e.response.data?.detail ||
+						e.response.data?.detail ||
+						e.response.statusText
+				)
+			);
+
+		// quizes = quizes.map(async (x) => ({
+		// 	...quizes,
+		// 	template: await axios
+		// 		.get(`/templates/${x.template.id}`)
+		// 		.then((x) => x.data),
+		// 	results: await axios.get(`/results`, {
+		// 		params: { quiz_id: x.quiz_id },
+		// 	}),
+		// }));
+		// let templates = [
+		// 	{
+		// 		name: "Теплейт 1",
+		// 		id: 1,
+		// 		tests_ids: [2, 3, 4, 1],
+		// 		quizzes: [{ name: "Квиз 1" }],
+		// 	},
+		// 	{
+		// 		name: "Теплейт 3",
+		// 		id: 1,
+		// 		tests_ids: [2, 3, 4],
+		// 		quizzes: [
+		// 			{ name: "Квиз 1" },
+		// 			{ name: "Квиз 3" },
+		// 			{ name: "Квиз 2" },
+		// 			{ name: "Квиз 5" },
+		// 		],
+		// 	},
+		// 	{
+		// 		name: "Теплейт 2",
+		// 		id: 1,
+		// 		tests_ids: [2, 4, 1],
+		// 		quizzes: [{ name: "Квиз 1" }],
+		// 	},
+		// ];
+		// console.log(templates);
+
+		this.setState({ templates, filtered: templates });
 	}
 
 	async checkPermissions() {
 		let check = await axios
 			.get(`/api/token/${this.state.token}/check_researcher`)
-			.then((x) => x.data)
-			.catch((e) => alert(e.response.statusText));
+			.then((x) => x.data.is_researcher)
+			.catch((e) =>
+				alert(
+					e.response.data?.detail ||
+						e.response.data?.detail ||
+						e.response.statusText
+				)
+			);
 		// let check = true;
-		this.setState({ check });
+		await this.getTemplates();
+		this.setState({ check, loading: false });
 	}
 
 	componentDidMount() {
@@ -57,66 +125,24 @@ export default class Templates extends Component {
 				let id = await axios
 					.get(`/api/token/${token}/id`)
 					.then((x) => x.data.respondent_id)
-					.catch((e) => alert(e.response.statusText));
+					.catch((e) =>
+						alert(
+							e.response.data?.detail ||
+								e.response.data?.detail ||
+								e.response.statusText
+						)
+					);
 
 				if (!id) token = await this.createToken();
 
 				this.setState({ token, id }, this.checkPermissions);
-			},
-			getTemplates: async () => {
-				let templates = await axios
-					.get("/api/templates", {
-						params: {
-							// respondent_id: this.state.id
-						},
-					})
-					.then((x) => x.data)
-					.catch((e) => alert(e.response.statusText));
-
-				// quizes = quizes.map(async (x) => ({
-				// 	...quizes,
-				// 	template: await axios
-				// 		.get(`/templates/${x.template.id}`)
-				// 		.then((x) => x.data),
-				// 	results: await axios.get(`/results`, {
-				// 		params: { quiz_id: x.quiz_id },
-				// 	}),
-				// }));
-				// let templates = [
-				// 	{
-				// 		name: "Теплейт 1",
-				// 		id: 1,
-				// 		tests_ids: [2, 3, 4, 1],
-				// 		quizzes: [{ name: "Квиз 1" }],
-				// 	},
-				// 	{
-				// 		name: "Теплейт 3",
-				// 		id: 1,
-				// 		tests_ids: [2, 3, 4],
-				// 		quizzes: [
-				// 			{ name: "Квиз 1" },
-				// 			{ name: "Квиз 3" },
-				// 			{ name: "Квиз 2" },
-				// 			{ name: "Квиз 5" },
-				// 		],
-				// 	},
-				// 	{
-				// 		name: "Теплейт 2",
-				// 		id: 1,
-				// 		tests_ids: [2, 4, 1],
-				// 		quizzes: [{ name: "Квиз 1" }],
-				// 	},
-				// ];
-				// console.log(templates);
-
-				this.setState({ templates, filtered: templates });
 			},
 		};
 		async function start() {
 			for (let i of Object.keys(getData)) {
 				await getData[i]();
 			}
-			this.setState({ loading: false });
+			// this.setState({ loading: false });
 		}
 		start.bind(this)();
 	}
@@ -183,7 +209,7 @@ export default class Templates extends Component {
 							onClick={() =>
 								(window.location.href = "/researcher/templates/create")
 							}
-							id="btnPlays"
+							id="btnPlayss"
 						>
 							Создать шаблон
 						</button>
@@ -234,14 +260,16 @@ export default class Templates extends Component {
 									</button>{" "}
 									{/* </div> */}
 									<button
-										onClick={() => (window.location.href = `/quizzes/create`)}
+										onClick={() =>
+											(window.location.href = `/researcher/quizzes/create`)
+										}
 										id="quizBtnComponent"
 									>
 										Создать опрос
 									</button>
 									<button
 										onClick={() =>
-											(window.location.href += `/researcher/templates/${x.id}`)
+											(window.location.href = `/researcher/templates/${x.id}`)
 										}
 										id="quizBtnComponent"
 									>

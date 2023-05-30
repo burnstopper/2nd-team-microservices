@@ -40,9 +40,8 @@ async def create_template(template_in: TemplateCreate, db: AsyncSession = Depend
     return await get_template_with_tests(template=new_template, tests_ids=template_in.tests_ids)
 
 
-@router.put('/{template_id}', status_code=status.HTTP_200_OK, response_model=TemplateWithTests)
-async def update_template(template_id: int, template_in: TemplateUpdate,
-                          db: AsyncSession = Depends(get_db)) -> TemplateWithTests:
+@router.put('/{template_id}', status_code=status.HTTP_200_OK)
+async def update_template(template_id: int, template_in: TemplateUpdate, db: AsyncSession = Depends(get_db)):
     """
     Update the template by id
     """
@@ -65,12 +64,9 @@ async def update_template(template_id: int, template_in: TemplateUpdate,
     if not is_valid_tests_ids:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Invalid test id')
 
-    updated_template: Template = await crud_templates.update_template(template_id=template_id, template_in=template_in,
-                                                                      db=db)
+    await crud_templates.update_template(template_id=template_id, template_in=template_in, db=db)
 
     await crud_template_tests.update_template_tests(template_id=template_id, tests=template_in.tests_ids, db=db)
-
-    return await get_template_with_tests(template=updated_template, tests_ids=template_in.tests_ids)
 
 
 @router.get('/tests', status_code=status.HTTP_200_OK, response_model=list[TemplateWithTests])

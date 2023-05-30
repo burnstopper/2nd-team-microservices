@@ -1,9 +1,10 @@
 import asyncio
-from typing import Callable
-from sqlalchemy import event
 from datetime import timedelta
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from typing import Callable
+
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from sqlalchemy import event
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 
 from app.core.config import settings
 from app.database.base import *

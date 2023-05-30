@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends
 
-from app.api.invite import router as invite_router
 from app.api.quiz_results import router as results_router
 from app.api.quizzes import router as quizzes_router
 from app.api.templates import router as template_router
@@ -14,12 +13,6 @@ api_router.include_router(quizzes_router,
                           prefix='/api/quizzes',
                           dependencies=[Depends(get_db)],
                           tags=['Quiz']
-                          )
-
-api_router.include_router(invite_router,
-                          prefix='/invite/quizzes',
-                          dependencies=[Depends(get_db)],
-                          tags=['Invite']
                           )
 
 api_router.include_router(template_router,

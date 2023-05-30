@@ -30,7 +30,7 @@ class Quiz extends Component {
 		let token = await axios
 			.post("/api/token/create_respondent")
 			.then((x) => x.data.respondent_token)
-			.catch((e) => alert(e.response.statusText));
+			.catch((e) => alert(e.response.data?.detail || e.response.statusText));
 		CookieLib.setCookieToken(token);
 		return token;
 	}
@@ -38,17 +38,28 @@ class Quiz extends Component {
 	async checkPermissions() {
 		let check = await axios
 			.get(`/api/token/${this.state.token}/check_researcher`)
-			.then((x) => x.data)
-			.catch((e) => alert(e.response.statusText));
+			.then((x) => x.data.is_researcher)
+			.catch((e) => alert(e.response.data?.detail || e.response.statusText));
 		// let check = true;
-		this.setState({ check });
+
+		let templates = await axios
+			.get(`/api/templates`)
+			.then((x) => x.data)
+			.catch((e) => alert(e.response.data?.detail || e.response.statusText));
+
+		this.setState({
+			templates,
+			template_id: templates[0]?.id,
+			check,
+			loading: false,
+		});
 	}
 
 	async getQuizData() {
 		let quiz = await axios
 			.get(`/api/quizzes/${this.state.quiz_id}`)
 			.then((x) => x.data)
-			.catch((e) => alert(e.response.statusText));
+			.catch((e) => alert(e.response.data?.detail || e.response.statusText));
 
 		if (quiz)
 			this.setState({
@@ -69,19 +80,12 @@ class Quiz extends Component {
 				let id = await axios
 					.get(`/api/token/${token}/id`)
 					.then((x) => x.data.respondent_id)
-					.catch((e) => alert(e.response.statusText));
+					.catch((e) =>
+						alert(e.response.data?.detail || e.response.statusText)
+					);
 				if (!id) token = await this.createToken();
 
 				this.setState({ token, id }, this.checkPermissions);
-			},
-
-			getTemplates: async () => {
-				let templates = await axios
-					.get(`/api/templates`)
-					.then((x) => x.data)
-					.catch((e) => alert(e.response.statusText));
-
-				this.setState({ templates, template_id: templates[0]?.id });
 			},
 		};
 		async function start() {
@@ -90,7 +94,8 @@ class Quiz extends Component {
 			}
 			if (this.state.quiz_id && this.state.quiz_id !== "create")
 				await this.getQuizData();
-			this.setState({ loading: false });
+
+			// this.setState({ loading: false });
 		}
 		start.bind(this)();
 	}
@@ -111,19 +116,25 @@ class Quiz extends Component {
 					description: this.state.description,
 					template_id: this.state.template_id,
 				})
-				.catch((e) => alert(e.response.statusText));
-		else
+				.catch((e) => alert(e.response.data?.detail || e.response.statusText));
+		else {
+			let status = await axios
+				.get(`/api/results/${this.state.quiz_id}/status`)
+				.then((x) => x.data.tests_status)
+				.catch((e) => alert(e.response.data?.detail || e.response.statusText));
+
+			if (status) return alert("У этого опроса уже есть результаты");
+
 			data = await axios
-				.put(`/api/quizzes`, {
-					id: this.state.quiz_id,
+				.put(`/api/quizzes/${this.state.quiz_id}`, {
 					name: this.state.name,
 					description: this.state.description,
 					template_id: this.state.template_id,
 				})
-				.catch((e) => alert(e.response.statusText));
-		if (data.status === 200)
-			window.location.href = `/researcher/info/${data.data.id}`;
-		else alert(data.statusText);
+				.catch((e) => alert(e.response.data?.detail || e.response.statusText));
+		}
+		if ([200, 201].includes(data?.status)) window.history.back();
+		else alert(data?.data?.detail || data.statusText);
 	}
 
 	render() {
@@ -197,7 +208,7 @@ class Quiz extends Component {
 				</div>
 
 				<div id="downTile">
-					<button id="btnPlay" onClick={this.submit.bind(this)}>
+					<button id="btnPlayssss" onClick={this.submit.bind(this)}>
 						Создать
 					</button>
 				</div>

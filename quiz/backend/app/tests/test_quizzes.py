@@ -113,7 +113,6 @@ async def test_update_quiz(async_client: AsyncClient):
         'template_id': 3
     })
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == updated_quiz_1
 
     response = await async_client.put(url='/api/quizzes/2', json={
         'name': 'Updated Quiz 2',
@@ -121,7 +120,6 @@ async def test_update_quiz(async_client: AsyncClient):
         'template_id': 2
     })
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == updated_quiz_2
 
     # test updating the quiz by invalid id
     response = await async_client.put(url='/api/quizzes/4', json={
@@ -145,24 +143,24 @@ async def test_update_quiz(async_client: AsyncClient):
 async def test_add_respondent_to_quiz(async_client: AsyncClient):
     # test adding a respondent to quiz
     respondent_id: int = 1
-    response = await async_client.post(url='/invite/quizzes/1/add', params={'respondent_id': respondent_id})
+    response = await async_client.post(url='/api/quizzes/1/add', params={'respondent_id': respondent_id})
     assert response.status_code == status.HTTP_200_OK
 
     respondent_id: int = 1
-    response = await async_client.post(url='/invite/quizzes/2/add', params={'respondent_id': respondent_id})
+    response = await async_client.post(url='/api/quizzes/2/add', params={'respondent_id': respondent_id})
     assert response.status_code == status.HTTP_200_OK
 
     respondent_id: int = 2
-    response = await async_client.post(url='/invite/quizzes/1/add', params={'respondent_id': respondent_id})
+    response = await async_client.post(url='/api/quizzes/1/add', params={'respondent_id': respondent_id})
     assert response.status_code == status.HTTP_200_OK
 
     # test adding the respondent who has been added
-    response = await async_client.post(url='/invite/quizzes/1/add', params={'respondent_id': respondent_id})
+    response = await async_client.post(url='/api/quizzes/1/add', params={'respondent_id': respondent_id})
     assert response.status_code == status.HTTP_409_CONFLICT
     assert json.loads(response.content)['detail'] == 'Respondent has already added to quiz'
 
     # test adding a respondent to quiz with invalid quiz_id
-    response = await async_client.post(url='/invite/quizzes/4/add', params={'respondent_id': respondent_id})
+    response = await async_client.post(url='/api/quizzes/4/add', params={'respondent_id': respondent_id})
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert json.loads(response.content)['detail'] == 'Invalid invite link: quiz with this id does not exist'
 
